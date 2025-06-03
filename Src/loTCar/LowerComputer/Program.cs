@@ -16,15 +16,14 @@ var host = Host.CreateDefaultBuilder().
         //注入电机服务
         AddSingleton(typeof(MotorService)).
         //Web服务器
-        AddSingleton(typeof(WebServerDIService), sp =>
+       AddWebServerService(80, HttpProtocol.Http).
+       //注入WebSocket
+        AddWebSocketService(new WebSocketServerOptions
         {
-            int port = 80;
-            HttpProtocol protocol = HttpProtocol.Http;
-            Type[] controllers = new Type[] { };
-            var webServer = new WebServerDIService(port, protocol, controllers, sp);
-            return webServer;
-        }).
-        AddWebSocketService();
+            IsStandAlone = false,
+            Port = 80,
+            MaxClients = 2,
+		});
     }).
     Build();
 

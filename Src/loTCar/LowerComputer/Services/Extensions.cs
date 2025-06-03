@@ -8,18 +8,27 @@ namespace LowerComputer.Services
 {
 	public static class Extensions
 	{
-		public static void AddWebServerService(this IServiceCollection services, int port, HttpProtocol protocol, Type[] controllers)
+		public static IServiceCollection AddWebServerService(this IServiceCollection services, int port, HttpProtocol protocol, Type[]? controllers=null)
 		{
+			return services.AddSingleton(typeof(WebServerDIService), sp =>
+			{
+				if(controllers==null)
+					controllers = new Type[0];
+				var webServerDiService=new WebServerDIService(port, protocol, controllers,sp);
+				return webServerDiService;
+			});
 		}
-		public static void AddWebSocketService(this IServiceCollection services, WebSocketServerOptions? options=null)
+
+		public static  IServiceCollection AddWebSocketService(this IServiceCollection services, WebSocketServerOptions? options=null)
 		{
-			services.AddSingleton(typeof(WebSocketService), sp =>
+			return services.AddSingleton(typeof(WebSocketService), sp =>
 			{
 				var motorService = (MotorService)sp.GetService(typeof(MotorService))
 					?? throw new InvalidOperationException("MotorService not registered");
 				return new WebSocketService(motorService, options);
 			});
 		}
+
 
 	}
 }

@@ -7,7 +7,7 @@ using System.Net.NetworkInformation;
 
 namespace LowerComputer.Services
 {
-    class WebServerDIService : WebServer
+   public class WebServerDIService : WebServer
     {
         private readonly IServiceProvider _serviceProvider;
         public WebServerDIService(int port, HttpProtocol protocol, Type[] controllers, IServiceProvider serviceProvider) : base(port, protocol, controllers)
@@ -15,24 +15,30 @@ namespace LowerComputer.Services
             _serviceProvider = serviceProvider;
 			CommandReceived += WebServerDIService_CommandReceived;
         }
-
 		private void WebServerDIService_CommandReceived(object sender, WebServerEventArgs e)
 		{
-			var url = e.Context.Request.RawUrl.ToLower();
-			Debug.WriteLine($"Received HTTP request: {url}");
-
-			 if (url == "/ws")
+			//check the path of the request
+			if (e.Context.Request.RawUrl == "/")
 			{
-				// WebSocket 升级请求由 WebSocketService 自动处理
-				var webServer= (WebSocketService)_serviceProvider.GetService(typeof(WebSocketService));
-				webServer.AddWebSocket(e.Context);
-				Debug.WriteLine("WebSocket upgrade request received");
+				//check if this is a websocket request or a page request 
+				if (e.Context.Request.Headers["Upgrade"] == "websocket")
+				{
+					Debug.WriteLine("connected");
+					var _wsServer = (WebSocketService)_serviceProvider.GetService(typeof(WebSocketService));
+					//Upgrade to a websocket
+					_wsServer.AddWebSocket(e.Context);
+				}
+				else
+				{
+					//Return the WebApp
+					e.Context.Response.ContentType = "text/html";
+				}
 			}
 			else
 			{
-				// 其他请求返回 404
-				OutputHttpCode(e.Context.Response,HttpStatusCode.NotFound);
-				Debug.WriteLine($"Unknown HTTP request: {url}");
+				//Send Page not Found
+				e.Context.Response.StatusCode = 404;
+				WebServer.OutPutStream(e.Context.Response, "Page not Found!");
 			}
 		}
 

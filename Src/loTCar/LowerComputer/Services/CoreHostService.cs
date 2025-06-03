@@ -27,14 +27,15 @@ namespace LowerComputer.Services
             if (wifiResult)
             {
                 Debug.WriteLine("连接成功"); 
-                _webServerDIService.Start();
                 _webSocketService.Start();
+                _webServerDIService.Start();
 
                 //即将塞进OLED模块
                 NetworkInterface networkInterface = NetworkInterface.GetAllNetworkInterfaces()[0];
                 Debug.WriteLine("ip地址"+networkInterface.IPv4Address);
 
                 Debug.WriteLine("开始监听!");
+
             }
             else
             {

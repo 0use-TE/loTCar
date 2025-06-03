@@ -11,24 +11,27 @@ namespace LowerComputer.Services
 	public class WebSocketService : WebSocketServer
 	{
 		private readonly MotorService _motorService;
-		private readonly WebSocketServerOptions _options;
 
-		public WebSocketService(MotorService motorService, WebSocketServerOptions? options = null): base(options)
+		public WebSocketService(MotorService motorService, WebSocketServerOptions? options = null) : base(options)
 		{
 			_motorService = motorService ?? throw new ArgumentNullException(nameof(motorService));
-			_options = options ?? new WebSocketServerOptions { Port = 80,  IsStandAlone = false };
 			MessageReceived += WebSocketService_MessageReceived;
-			Debug.WriteLine($"WebSocketService initialized with Port: {_options.Port}, Prefix: {_options.Prefix}");
 		}
 
 		private void WebSocketService_MessageReceived(object sender, MessageReceivedEventArgs e)
 		{
-			var buffer = e.Frame.Buffer;
-			var content = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-			Debug.WriteLine($"Received: {content}");
-			content = "forward";
 			try
 			{
+				var buffer = e.Frame.Buffer;
+				var content = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+				Debug.WriteLine($"Frame Type: {e.Frame.MessageType}, Length: {buffer.Length}");
+				if (content == null)
+				{
+					Debug.WriteLine($"Received buffer length: {buffer.Length}, Raw: {BitConverter.ToString(buffer)}");
+					return;
+				}
+				Debug.WriteLine($"Received: {content}");
+
 				switch (content.ToLower())
 				{
 					case "forward":
@@ -50,6 +53,7 @@ namespace LowerComputer.Services
 						Debug.WriteLine($"Unknown command: {content}");
 						break;
 				}
+
 			}
 			catch (Exception ex)
 			{
