@@ -11,11 +11,11 @@ namespace LowerComputer.Services
 		private readonly GpioController gpioController;
 		private readonly PwmChannel pwm_ENA;
 		private readonly PwmChannel pwm_ENB;
-		public const int ENA = 16; // PWM for left motor speed
+		public const int ENA = 16; // PWM for left motor speed- 
 		public const int IN1 = 17; // Left motor direction 1
 		public const int IN2 = 5;  // Left motor direction 2
-		public const int IN3 = 18; // Right motor direction 1
-		public const int IN4 = 19; // Right motor direction 2
+		public const int IN3 = 19; // Right motor direction 1
+		public const int IN4 = 18; // Right motor direction 2
 		public const int ENB = 21; // PWM for right motor speed
 		public MotorService()
 		{
@@ -33,8 +33,9 @@ namespace LowerComputer.Services
 				gpioController.OpenPin(IN4, PinMode.Output);
 
 				// Initialize PWM channels
-				pwm_ENA = PwmChannel.CreateFromPin(ENA, frequency: 4000);
-				pwm_ENB = PwmChannel.CreateFromPin(ENB, frequency: 4000);
+				pwm_ENA = PwmChannel.CreateFromPin(ENA, frequency:1000);
+				pwm_ENB = PwmChannel.CreateFromPin(ENB, frequency: 1000);
+
 				// Start PWM
 				pwm_ENA.Start();
 				pwm_ENB.Start();
@@ -72,6 +73,8 @@ namespace LowerComputer.Services
 		/// <param name="speed">Speed percentage (0 to 100).</param>
 		public void Forward(int speed)
 		{
+			SetSpeed(speed);
+
 			// Left motor forward: IN1 = High, IN2 = Low
 			gpioController.Write(IN1, PinValue.High);
 			gpioController.Write(IN2, PinValue.Low);
@@ -80,8 +83,6 @@ namespace LowerComputer.Services
 			gpioController.Write(IN3, PinValue.High);
 			gpioController.Write(IN4, PinValue.Low);
 
-			// Set speed
-			SetSpeed(speed);
 			Debug.WriteLine($"Moving forward at speed {speed}%");
 		}
 
@@ -91,6 +92,10 @@ namespace LowerComputer.Services
 		/// <param name="speed">Speed percentage (0 to 100).</param>
 		public void Backward(int speed)
 		{
+
+			// Set speed
+			SetSpeed(speed);
+
 			// Left motor backward: IN1 = Low, IN2 = High
 			gpioController.Write(IN1, PinValue.Low);
 			gpioController.Write(IN2, PinValue.High);
@@ -98,9 +103,6 @@ namespace LowerComputer.Services
 			// Right motor backward: IN3 = Low, IN4 = High
 			gpioController.Write(IN3, PinValue.Low);
 			gpioController.Write(IN4, PinValue.High);
-
-			// Set speed
-			SetSpeed(speed);
 			Debug.WriteLine($"Moving backward at speed {speed}%");
 		}
 
@@ -110,6 +112,11 @@ namespace LowerComputer.Services
 		/// <param name="speed">Speed percentage (0 to 100).</param>
 		public void TurnLeft(int speed)
 		{
+
+			// Set speed (only for right motor)
+			pwm_ENA.DutyCycle = 0; // Stop left motor
+			pwm_ENB.DutyCycle = speed / 100.0; // Right motor speed
+
 			// Left motor stopped: IN1 = Low, IN2 = Low
 			gpioController.Write(IN1, PinValue.Low);
 			gpioController.Write(IN2, PinValue.Low);
@@ -118,9 +125,7 @@ namespace LowerComputer.Services
 			gpioController.Write(IN3, PinValue.High);
 			gpioController.Write(IN4, PinValue.Low);
 
-			// Set speed (only for right motor)
-			pwm_ENA.DutyCycle = 0; // Stop left motor
-			pwm_ENB.DutyCycle = speed / 100.0; // Right motor speed
+
 			Debug.WriteLine($"Turning left at speed {speed}%");
 		}
 
@@ -130,6 +135,11 @@ namespace LowerComputer.Services
 		/// <param name="speed">Speed percentage (0 to 100).</param>
 		public void TurnRight(int speed)
 		{
+
+			// Set speed (only for left motor)
+			pwm_ENA.DutyCycle = speed / 100.0; // Left motor speed
+			pwm_ENB.DutyCycle = 0; // Stop right motor
+
 			// Left motor forward: IN1 = High, IN2 = Low
 			gpioController.Write(IN1, PinValue.High);
 			gpioController.Write(IN2, PinValue.Low);
@@ -138,9 +148,7 @@ namespace LowerComputer.Services
 			gpioController.Write(IN3, PinValue.Low);
 			gpioController.Write(IN4, PinValue.Low);
 
-			// Set speed (only for left motor)
-			pwm_ENA.DutyCycle = speed / 100.0; // Left motor speed
-			pwm_ENB.DutyCycle = 0; // Stop right motor
+
 			Debug.WriteLine($"Turning right at speed {speed}%");
 		}
 
