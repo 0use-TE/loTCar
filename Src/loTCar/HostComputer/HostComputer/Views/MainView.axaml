@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:HostComputer.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="HostComputer.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+	
+<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+    <Button Content="前进" Command="{Binding ForwardCommand}" Width="100" />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+      <Button Content="左转" Command="{Binding TurnLeftCommand}" Width="100" />
+      <Button Content="停止" Command="{Binding StopCommand}" Width="100" />
+      <Button Content="右转" Command="{Binding TurnRightCommand}" Width="100" />
+    </StackPanel>
+    <Button Content="后退" Command="{Binding BackwardCommand}" Width="100" />
+  </StackPanel>
+		
+</UserControl>
