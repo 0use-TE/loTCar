@@ -13,8 +13,10 @@ var host = Host.CreateDefaultBuilder().
     {
         //运行服务
         service.AddHostedService(typeof(CoreHostService)).
-        //注入电机服务
-        AddSingleton(typeof(MotorService)).
+        //添加wifi服务
+        AddWifiConnectService("ouse", "80231314w").
+		//注入电机服务
+		AddSingleton(typeof(MotorService)).
         //Web服务器
        AddWebServerService(80, HttpProtocol.Http, new Type[] {
            typeof(MotorController)});

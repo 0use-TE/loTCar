@@ -1,46 +1,73 @@
-﻿using LowerComputer.Services;
+﻿using LowerComputer.Misc;
+using LowerComputer.Services;
 using nanoFramework.WebServer;
-using System;
-using System.Diagnostics;
 using System.Net;
-using System.Text;
 
 namespace LowerComputer.Controllers
 {
 	public class MotorController
 	{
 		private readonly MotorService _motorService;
+		private class MoveCommand
+		{
+			public int Speed { get; set; } // 前进速度
+		}
 		public MotorController(MotorService motorService)
 		{
 			_motorService = motorService;
 		}
-
-		[Route("forword")]
+		[Route("move/forward")]
 		[Method("POST")]
 		public void Forward(WebServerEventArgs e)
 		{
-			Debug.WriteLine("前进");
-			var request= e.Context.Request;
-			var result= request.ReadBody();
-			// 将 byte[] 转换为字符串
-			string body = Encoding.UTF8.GetString(result, 0, result.Length);
-			Debug.WriteLine($"Request body: {body}");
+			var moveCommand = (MoveCommand)JsonHelper.ReadJsonBody(e, typeof(MoveCommand));
+			_motorService.Forward(moveCommand.Speed);
 
-
-			//Get the speed from the request body
-			_motorService.Forward(50); // 前进
-			e.Context.Response.StatusCode= (int)HttpStatusCode.OK;
-			WebServer.OutPutStream(e.Context.Response, "Sucessful");
+			e.Context.Response.StatusCode = (int)HttpStatusCode.OK;
+			WebServer.OutPutStream(e.Context.Response, "前进");
 		}
 
-		[Route("forword")]
+		[Route("move/stop")]
 		[Method("POST")]
 		public void Stop(WebServerEventArgs e)
 		{
-			_motorService.Stop(); // 停止
+			_motorService.Stop();
+
 			e.Context.Response.StatusCode = (int)HttpStatusCode.OK;
-			WebServer.OutPutStream(e.Context.Response, "Sucessful");
+			WebServer.OutPutStream(e.Context.Response, "停止");
 		}
 
+		[Route("move/backward")]
+		[Method("POST")]
+		public void Backward(WebServerEventArgs e)
+		{
+			var moveCommand = (MoveCommand)JsonHelper.ReadJsonBody(e, typeof(MoveCommand));
+			_motorService.Backward(moveCommand.Speed);
+
+			e.Context.Response.StatusCode = (int)HttpStatusCode.OK;
+			WebServer.OutPutStream(e.Context.Response, "后退");
+		}
+
+		[Route("move/left")]
+		[Method("POST")]
+		public void TurnLeft(WebServerEventArgs e)
+		{
+			var moveCommand = (MoveCommand)JsonHelper.ReadJsonBody(e, typeof(MoveCommand));
+			_motorService.TurnLeft(moveCommand.Speed);
+
+			e.Context.Response.StatusCode = (int)HttpStatusCode.OK;
+			WebServer.OutPutStream(e.Context.Response, "左转");
+		}
+
+		[Route("move/right")]
+		[Method("POST")]
+		public void TurnRight(WebServerEventArgs e)
+		{
+			var moveCommand = (MoveCommand)JsonHelper.ReadJsonBody(e, typeof(MoveCommand));
+			_motorService.TurnRight(moveCommand.Speed);
+
+			e.Context.Response.StatusCode = (int)HttpStatusCode.OK;
+			WebServer.OutPutStream(e.Context.Response, "右转");
+		}
 	}
 }

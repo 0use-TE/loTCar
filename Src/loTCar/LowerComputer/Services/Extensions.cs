@@ -17,5 +17,14 @@ namespace LowerComputer.Services
 				return webServerDiService;
 			});
 		}
+
+		public static IServiceCollection AddWifiConnectService(this IServiceCollection services, string ssid, string password)
+		{
+			return services.AddSingleton(typeof(WifiConnectService), sp =>
+			{
+				var wifiConnectService = new WifiConnectService(ssid, password);
+				return wifiConnectService;
+			});
+		}
 	}
 }

@@ -33,8 +33,8 @@ namespace LowerComputer.Services
 				gpioController.OpenPin(IN4, PinMode.Output);
 
 				// Initialize PWM channels
-				pwm_ENA = PwmChannel.CreateFromPin(ENA, frequency:1000);
-				pwm_ENB = PwmChannel.CreateFromPin(ENB, frequency: 1000);
+				pwm_ENA = PwmChannel.CreateFromPin(ENA,frequency:20_000);
+				pwm_ENB = PwmChannel.CreateFromPin(ENB,frequency:20_000);
 
 				// Start PWM
 				pwm_ENA.Start();
@@ -58,7 +58,7 @@ namespace LowerComputer.Services
 		{
 			if (speed < 0 || speed > 100)
 			{
-				throw new ArgumentOutOfRangeException(nameof(speed), "Speed must be between 0 and 100.");
+				speed=(int)Math.Clamp(speed, 0, 100);
 			}
 
 			// Convert speed percentage to PWM duty cycle (0.0 to 1.0)

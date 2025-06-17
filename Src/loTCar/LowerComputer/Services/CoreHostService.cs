@@ -10,19 +10,17 @@ namespace LowerComputer.Services
 {
     class CoreHostService : BackgroundService
     {
+        private readonly WifiConnectService _wifiConnectService;
         private readonly WebServerDIService _webServerDIService;
-        public CoreHostService(WebServerDIService webServerDI)
+        public CoreHostService(WebServerDIService webServerDI,WifiConnectService wifiConnectService)
         {
             _webServerDIService = webServerDI;
-        }
+            _wifiConnectService = wifiConnectService;
+		}
         protected override void ExecuteAsync(CancellationToken stoppingToken)
         {
-            Debug.WriteLine("开始连接Wifi");
-            ///先实现局域网控制
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(60_000);
-            var wifiResult = WifiNetworkHelper.ConnectDhcp("ouse", "80231314w", requiresDateTime: true, token: cancellationTokenSource.Token);
-
-            if (wifiResult)
+            var wifiResult= _wifiConnectService.ConnectWifi();
+			if (wifiResult)
             {
                 Debug.WriteLine("连接成功"); 
                 _webServerDIService.Start();
