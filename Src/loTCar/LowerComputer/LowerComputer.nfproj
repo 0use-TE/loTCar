@@ -21,11 +21,13 @@
   <ItemGroup>
     <Compile Include="Controllers\MotorController.cs" />
     <Compile Include="Misc\JsonHelper.cs" />
+    <Compile Include="Services\APService.cs" />
     <Compile Include="Services\CoreHostService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Extensions.cs" />
     <Compile Include="Services\MotorService.cs" />
+    <Compile Include="Services\OLEDService.cs" />
     <Compile Include="Services\WebServerDIService.cs" />
     <Compile Include="Services\WifiConnectService.cs" />
   </ItemGroup>
